@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mevra ❤️ Mizra</title>
+  <meta name="theme-color" content="#ff5f7e" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style_plus.css" />
+</head>
+<body>
+
+  <!-- Background Hearts -->
+  <div id="bgHearts" aria-hidden="true"></div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
+  <canvas id="confettiCanvas" class="confetti" aria-hidden="true"></canvas>
+
+  <!-- SW UPDATE BANNER -->
+<div id="swUpdate" class="sw-update" hidden>
+  <div class="sw-update-inner">
+    <span>Yeni sürüm hazır.</span>
+    <div class="sw-update-actions">
+      <button id="swReloadBtn" class="primary" type="button">Güncelle</button>
+      <button id="swDismissBtn" class="ghost" type="button">Kapat</button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- LOGIN -->
+  <div id="loginScreen" class="screen">
+    <div class="login-box" role="dialog" aria-label="Giriş">
+      <h1>Mevra <span>❤️</span> Mizra</h1>
+      <p>Özel Evrenimize Giriş</p>
+
+      <label class="sr-only" for="loginPassword">Şifre</label>
+      <input type="password" id="loginPassword" placeholder="Şifre" autocomplete="current-password" />
+
+      <div class="row">
+        <label class="checkbox">
+          <input type="checkbox" id="rememberMe" />
+          <span>Beni hatırla</span>
+        </label>
+        <button class="ghost" id="hintBtn" type="button" title="İpucu">?</button>
+      </div>
+
+      <button class="primary" id="loginBtn" type="button">Giriş Yap</button>
+      <span id="loginError" class="error" role="status"></span>
+
+      <div class="tiny muted">
+        Bu site kişisel kullanım içindir. Veriler tarayıcıda (LocalStorage) saklanır.
+      </div>
+    </div>
+  </div>
+
+  <!-- SITE -->
+  <div id="site" class="site" hidden>
+
+    <header class="header">
+      <div class="header-inner">
+        <div>
+          <h1>Mevra ❤️ Mizra</h1>
+          <p>Bizim Küçük Evrenimiz</p>
+        </div>
+
+        <div class="header-actions">
+          <select id="themeSelect" class="select" aria-label="Tema Seç">
+            <option value="pink">Pembe</option>
+            <option value="violet">Mor</option>
+            <option value="night">Gece</option>
+            <option value="ocean">Okyanus</option>
+            <option value="sunset">Gün Batımı</option>
+            <option value="forest">Orman</option>
+            <option value="cherry">Kiraz</option>
+            <option value="graphite">Grafit</option>
+
+            <option value="sky">Gökyüzü</option>
+            <option value="mint">Nane</option>
+            <option value="lemon">Limon</option>
+            <option value="coral">Mercan</option>
+            <option value="ruby">Yakut</option>
+            <option value="lavender">Lavanta</option>
+            <option value="peach">Şeftali</option>
+            <option value="sand">Kum</option>
+            <option value="coffee">Kahve</option>
+            <option value="aurora">Aurora</option>
+            <option value="teal">Turkuaz</option>
+            <option value="indigo">İndigo</option>
+            <option value="slate">Slate</option>
+          </select>
+
+          <!-- JS içinde buildThemePalette/initTheme/syncThemeUI çağrıları için güvenli placeholder -->
+          <div id="themePalette" class="theme-palette" aria-label="Tema Paleti" hidden></div>
+
+          
+          <button class="ghost" id="installBtn" type="button" hidden>Uygulamayı Yükle</button>
+<button class="ghost" id="logoutBtn" type="button">Çıkış</button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="nav" aria-label="Sayfa menüsü">
+      <button data-page="home" class="navbtn active" type="button">Ana Sayfa</button>
+      <button data-page="memories" class="navbtn" type="button">Anılar</button>
+      <button data-page="diary" class="navbtn" type="button">Anı Defteri</button>
+      <button data-page="special" class="navbtn" type="button">Özel Günler</button>
+      <button data-page="chat" class="navbtn" type="button">Mini Sohbet</button>
+      <button data-page="game" class="navbtn" type="button">Oyun</button>
+      <button data-page="future" class="navbtn" type="button">Gelecek</button>
+      <button data-page="calendar" class="navbtn" type="button">Takvim</button>
+      <button data-page="settings" class="navbtn" type="button">Ayarlar</button>
+    </nav>
+
+    <main class="main">
+
+      <!-- HOME -->
+      <section id="home" class="page active">
+        <h2>Hoş Geldin</h2>
+        <p class="muted">
+          Bu site sadece bizim hikâyemiz için var. Burada anılar birikir, kelimeler saklanır ve geleceğe notlar bırakılır.
+        </p>
+
+        <div class="grid2 mt16">
+          <div class="card">
+            <h3>Bugünün Tarihi</h3>
+            <p id="todayText" class="muted">—</p>
+          </div>
+
+          <div class="card">
+            <h3>En Yakın Özel Gün</h3>
+            <p id="nextSpecialText" class="muted">Henüz eklenmedi.</p>
+            <div class="row mt12" style="justify-content:flex-start;">
+              <button class="ghost" id="notifyBtn" type="button">Bildirimleri Aç</button>
+              <span id="notifyState" class="tiny muted"></span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Hızlı Kısayollar</h3>
+            <div class="chips">
+              <button class="chip" data-jump="memories" type="button">Anı ekle</button>
+              <button class="chip" data-jump="diary" type="button">Bir şey yaz</button>
+              <button class="chip" data-jump="special" type="button">Özel gün ekle</button>
+              <button class="chip" data-jump="game" type="button">Kalp oyunu</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid2 mt16">
+          <div class="card">
+            <h3>Geri Sayım</h3>
+            <p id="nextSpecialCountdown" class="muted">—</p>
+            <p class="tiny muted">En yakın özel güne canlı geri sayım.</p>
+          </div>
+
+          <div class="card">
+            <h3>İstatistik</h3>
+            <div id="dashStats" class="muted">—</div>
+            <p class="tiny muted">Anılar, kayıtlar ve sohbet sayıları.</p>
+          </div>
+
+          <div class="card">
+            <h3>Bugün Geçmişte</h3>
+            <div id="todayInPast" class="muted">—</div>
+            <p class="tiny muted">Aynı gün/ayda yazdıkların (varsa).</p>
+          </div>
+        
+        <div class="grid2 mt16">
+          <div class="card">
+            <h3>Sürpriz</h3>
+            <p class="muted tiny">Tek tıkla tatlı bir mesaj, mini görev veya randevu fikri üret.</p>
+            <div class="row mt12" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+              <button class="primary" id="surpriseBtn" type="button">Üret</button>
+              <button class="ghost" id="surpriseCopyBtn" type="button">Kopyala</button>
+              <button class="ghost" id="surpriseShareBtn" type="button">Paylaş</button>
+            </div>
+            <div id="surpriseOut" class="muted mt12" style="white-space:pre-wrap;"></div>
+          </div>
+
+          <div class="card">
+            <h3>Hızlı Kurulum</h3>
+            <p class="tiny muted">PWA olarak yükle, bildirim iznini aç, yedek al. 3 adımda bitti.</p>
+            <div class="chips mt10">
+              <button class="chip" id="quickInstallChip" type="button">Yükleme</button>
+              <button class="chip" id="quickNotifyChip" type="button">Bildirim</button>
+              <button class="chip" id="quickBackupChip" type="button">Yedek</button>
+            </div>
+            <div id="quickSetupOut" class="tiny muted mt12"></div>
+          </div>
+        </div>
+
+</div>
+      </section>
+
+      <!-- MEMORIES -->
+      <section id="memories" class="page">
+        <h2>Anılar</h2>
+
+        <div class="grid2 mt16">
+          <div class="card">
+            <div class="card-head">
+              <h3>Yeni Anı Ekle</h3>
+              <span class="tiny muted">Bu tarayıcıda saklanır.</span>
+            </div>
+
+            <div class="field">
+              <label class="label" for="memoryImage">Görsel</label>
+              <input type="file" id="memoryImage" accept="image/*" />
+              <div id="memoryImagePreview" class="img-preview" hidden>
+                <img id="memoryImagePreviewImg" alt="Seçilen görsel önizleme" />
+                <button class="ghost mini" id="memoryImageClearBtn" type="button">Kaldır</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="memoryTitle">Başlık</label>
+              <input type="text" id="memoryTitle" maxlength="60" placeholder="Kısa başlık (opsiyonel)" />
+              <div class="row tiny muted" style="justify-content:space-between;">
+                <span>İpucu: 3–6 kelime yeter.</span>
+                <span id="memoryTitleCount">0/60</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="memoryText">Açıklama</label>
+              <textarea id="memoryText" maxlength="1200" placeholder="Anı açıklaması"></textarea>
+              <div class="row tiny muted" style="justify-content:space-between;">
+                <span>Markdown destek: **kalın**, *italik*, `kod`.</span>
+                <span id="memoryTextCount">0/1200</span>
+              </div>
+            </div>
+
+            <div class="grid2 mt12">
+              <div class="field" style="margin:0;">
+                <label class="label" for="memoryDate">Tarih</label>
+                <input type="date" id="memoryDate" />
+              </div>
+
+              <div class="field" style="margin:0;">
+                <label class="label" for="memoryAlbum">Albüm</label>
+                <input type="text" id="memoryAlbum" maxlength="40" placeholder="Örn: Yaz Tatili 2025 (opsiyonel)" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="memoryTags">Etiketler</label>
+              <input type="text" id="memoryTags" placeholder="Örn: tatil, hediye, okul" />
+              <div id="memoryTagsPreview" class="chips mt10" aria-label="Etiket önizleme" hidden></div>
+            </div>
+
+            <div class="row mt12">
+              <button class="primary" id="addMemoryBtn" type="button">Ekle</button>
+              <button class="ghost" id="clearMemoryFormBtn" type="button">Formu Temizle</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Anı Arama</h3>
+              <button class="ghost mini" id="memoryClearFiltersBtn" type="button">Filtreleri Sıfırla</button>
+            </div>
+
+            <input type="text" id="memorySearch" placeholder="Başlık/açıklama/etiket/album içinde ara..." />
+
+            <div class="filters mt12">
+              <select id="memoryAlbumFilter" class="select" aria-label="Albüm filtresi"></select>
+              <select id="memorySort" class="select" aria-label="Anı sıralama">
+                <option value="new">Yeni → Eski</option>
+                <option value="old">Eski → Yeni</option>
+                <option value="date">Tarihe göre</option>
+                <option value="title">Başlığa göre</option>
+              </select>
+              <button class="ghost" id="memoryTagFilterBtn" type="button">Etiket Filtre</button>
+              <button class="ghost" id="memorySlideshowBtn" type="button">Slayt Gösterisi</button>
+            </div>
+
+            <div id="memoryTagFilter" class="tag-filter mt12" hidden></div>
+            <div id="memoryStats" class="muted tiny mt10">—</div>
+          </div>
+        </div>
+
+        <div id="memoryEmpty" class="empty mt16" hidden>
+          <div class="empty-inner">
+            <h3>Henüz anı yok</h3>
+            <p class="muted">İlk anını ekleyerek başlayabilirsin.</p>
+            <button class="primary" data-jump="memories" type="button">Anı ekle</button>
+          </div>
+        </div>
+
+        <div id="memoryList" class="memory-list mt16"></div>
+      </section>
+<!-- DIARY -->
+      <section id="diary" class="page">
+        <h2>Anı Defteri</h2>
+
+        <div class="grid2 mt16">
+          <div class="card">
+            <h3>Kayıtlar</h3>
+            <input type="text" id="diarySearch" placeholder="Kayıtlarda ara..." />
+            <div class="row mt12" style="justify-content:flex-start;">
+              <button class="primary" id="newDiaryBtn" type="button">Yeni Kayıt</button>
+              <button class="ghost" id="toggleDiaryPreviewBtn" type="button">Önizleme</button>
+            </div>
+            <div id="diaryList" class="list mt12"></div>
+          </div>
+
+          <div class="card">
+            <h3>Düzenleyici</h3>
+            <div class="row" style="justify-content:flex-start;">
+              <input type="text" id="diaryTitle" placeholder="Başlık (opsiyonel)" />
+            </div>
+            <textarea id="diaryText" placeholder="Bugün ne hissettin?"></textarea>
+
+            <div id="diaryPreview" class="preview mt12" hidden></div>
+
+            <div class="row mt12">
+              <button class="primary" id="saveDiaryBtn" type="button">Kaydet</button>
+              <button class="danger" id="deleteDiaryBtn" type="button">Sil</button>
+              <span id="diarySaved" class="muted"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SPECIAL -->
+      <section id="special" class="page">
+        <h2>Özel Günler</h2>
+
+        <div class="card mt16">
+          <h3>En Yakın Özel Gün</h3>
+          <p id="specialCountdown" class="muted">—</p>
+          <p class="tiny muted">Canlı geri sayım.</p>
+        </div>
+
+        <div class="grid2 mt16">
+          <div class="card">
+            <h3>Yeni Gün Ekle</h3>
+            <input type="text" id="specialName" placeholder="Örn: Tanışma Günü" />
+            <input type="date" id="specialDate" />
+
+            <div class="row mt12" style="justify-content:flex-start; flex-wrap:wrap;">
+  <label class="checkbox" style="margin:0;">
+    <input type="checkbox" id="specialNotify" checked />
+    <span>Bildirim gönder</span>
+  </label>
+
+  <label class="checkbox" style="margin:0;">
+    <input type="checkbox" id="specialRepeat" checked />
+    <span>Her yıl tekrarla</span>
+  </label>
+<div class="row mt12" style="justify-content:flex-start; flex-wrap:wrap;">
+  <input type="text" id="chatSearch" placeholder="Sohbette ara..." />
+  <button class="ghost" id="attachBtn" type="button">Dosya ekle</button>
+  <input type="file" id="chatFile" class="sr-only" accept="image/*,audio/*" />
+</div>
+
+  <div class="row" style="justify-content:flex-start; gap:12px; flex-wrap:wrap;">
+    <label class="checkbox" style="margin:0;">
+      <input type="checkbox" id="remind7" checked />
+      <span>7 gün önce</span>
+    </label>
+    <label class="checkbox" style="margin:0;">
+      <input type="checkbox" id="remind1" checked />
+      <span>1 gün önce</span>
+    </label>
+    <label class="checkbox" style="margin:0;">
+      <input type="checkbox" id="remind0" checked />
+      <span>Aynı gün</span>
+    </label>
+  </div>
+</div>
+
+
+            <button class="primary" id="addSpecialBtn" type="button">Ekle</button>
+          </div>
+
+          <div class="card">
+            <h3>Liste</h3>
+            <ul id="specialList" class="special-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAT -->
+      <section id="chat" class="page">
+        <h2>Mini Sohbet</h2>
+
+        <div class="card mt16">
+          <div class="row" style="justify-content:flex-start; flex-wrap:wrap;">
+            <select id="chatSender" class="select" aria-label="Mesaj sahibi">
+              <option value="mevra">Mevra</option>
+              <option value="mizra">Mizra</option>
+            </select>
+
+            <!-- JS'de kullanılıyor ama HTML'de yoktu: EKLENDİ -->
+            <input type="text" id="chatSearch" placeholder="Sohbette ara..." style="max-width:220px;" />
+
+            <button class="ghost" id="pinLastBtn" type="button">Son mesajı sabitle</button>
+            <button class="ghost" id="clearChatBtn" type="button">Temizle</button>
+
+            <!-- JS'de kullanılıyor ama HTML'de yoktu: EKLENDİ -->
+            <button class="ghost" id="attachBtn" type="button">📎 Ekle</button>
+            <input type="file" id="chatFile" class="sr-only" accept="image/*,audio/*" />
+          </div>
+
+          <div id="chatPinned" class="pinned mt12" hidden></div>
+          <div id="chatBox" class="chatbox mt12" aria-label="Sohbet kutusu"></div>
+
+          <div class="chatbar">
+            <textarea id="chatInput" rows="3" placeholder="Mesaj yaz (Enter ile gönder • Shift+Enter = satır)"></textarea>
+            <button class="primary" id="sendChatBtn" type="button">Gönder</button>
+          </div>
+
+          <p class="tiny muted">
+            Mesajlar tarayıcıda saklanır. Mesaja tıklayınca ❤️ reaksiyon eklenir. Shift+Tık ile emoji reaksiyon seçebilirsin.
+            Sağ tık ile silinebilir. Çift tık ile sabitle/sabiti kaldır.
+          </p>
+        </div>
+      </section>
+
+      <!-- GAME -->
+      <section id="game" class="page">
+        <h2>Kalp Oyunu</h2>
+
+        <div class="grid2 mt16">
+          <div class="card">
+            <h3>Skor</h3>
+            <p class="scoreline">
+              Skor: <span id="score">0</span>
+              <span class="sep">•</span>
+              Süre: <span id="timeLeft">30</span>s
+              <span class="sep">•</span>
+              En iyi: <span id="bestScore">0</span>
+              <span class="sep">•</span>
+              Combo: <span id="combo">0</span>
+              <span class="sep">•</span>
+              Kaçırma: <span id="miss">0</span>
+            </p>
+
+            <div class="row">
+              <button class="primary" id="startGameBtn" type="button">Başlat</button>
+              <button class="ghost" id="resetBestBtn" type="button">En iyiyi sıfırla</button>
+            </div>
+
+            <div class="row mt12" style="justify-content:flex-start;">
+              <label class="checkbox" style="margin:0;">
+                <input type="checkbox" id="soundToggle" />
+                <span>Ses</span>
+              </label>
+              <select id="difficulty" class="select" aria-label="Zorluk">
+                <option value="normal">Normal</option>
+                <option value="hard">Zor</option>
+                <option value="insane">Çok Zor</option>
+              </select>
+            </div>
+
+            <div class="mt12">
+              <h3 style="margin:12px 0 8px;">Son Skorlar</h3>
+              <div id="lastScores" class="list"></div>
+            </div>
+
+            <p class="tiny muted">Oyun başlayınca kalp kaçacak. Tıklayıp yakala.</p>
+          </div>
+
+          <div class="card">
+            <h3>Oyun Alanı</h3>
+            <div id="gameArea" class="game-area" aria-label="Oyun alanı">
+              <button id="heartTarget" class="heart" type="button" aria-label="Kalbi yakala" hidden>❤️</button>
+            </div>
+          </div>
+        </div>
+
+<div class="grid2 mt16">
+  <div class="card">
+    <h3>💗 Kalp Eşleştirme</h3>
+    <p class="tiny muted">Aynı kalpleri bul, hafızanı konuştur.</p>
+    <button class="primary" id="btnLoveMemory" type="button">Başla</button>
+  </div>
+
+  <div class="card">
+    <h3>💞 Aşk Testi</h3>
+    <p class="tiny muted">Mini test: uyum puanı ve tatlı yorumlar.</p>
+    <button class="primary" id="btnLoveQuiz" type="button">Teste Başla</button>
+  </div>
+
+  <div class="card">
+    <h3>🎮 Sıra Bazlı Aşk Oyunu</h3>
+    <p class="tiny muted">2 kişilik “Aşk Üçtaşı” (tic-tac-toe). Kazanan kalpleri toplar.</p>
+    <button class="primary" id="btnLoveTtt" type="button">Başla</button>
+  </div>
+
+  <div class="card">
+    <h3>🔊 Sesli Romantik Oyun</h3>
+    <p class="tiny muted">Melodi tekrar et: dinle, sırayı hatırla, bas.</p>
+    <button class="primary" id="btnLoveSound" type="button">Başla</button>
+  </div>
+</div>
+
+<div class="grid2 mt16">
+  <div class="card">
+    <h3>🧠 Beni Ne Kadar Tanıyorsun?</h3>
+    <p class="tiny muted">Sorular değişir. Sonuçlar kayıt edilir.</p>
+    <button class="primary" id="btnKnowMe" type="button">Başla</button>
+  </div>
+
+  <div class="card">
+    <h3>🏆 Rozetler & İstatistik</h3>
+    <p class="tiny muted">Oyun başarılarını ve rekorlarını gör.</p>
+    <div class="row mt12" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+      <button class="ghost" id="btnAchievements" type="button">Rozetler</button>
+      <button class="ghost" id="btnGameStats" type="button">İstatistik</button>
+      <button class="danger" id="btnResetGameData" type="button">Sıfırla</button>
+    </div>
+    <div id="gameQuickStats" class="tiny muted mt12"></div>
+  </div>
+</div>
+
+<!-- GAME MODAL -->
+<div id="gameModal" class="modal" hidden>
+  <div class="modal-inner">
+    <div class="row" style="justify-content:space-between; align-items:center;">
+      <h3 id="gameTitle" style="margin:0;"></h3>
+      <button class="ghost mini" id="gameCloseX" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div id="gameBody" class="mt12"></div>
+    <div class="row mt12" style="justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+      <button class="ghost" id="gameCloseBtn" type="button">Kapat</button>
+    </div>
+  </div>
+</div>
+</section>
+
+      <!-- FUTURE -->
+      <section id="future" class="page">
+        <h2>Gelecek</h2>
+
+        <div class="grid2 mt16">
+          <div class="card">
+            <h3>Notlar</h3>
+            <input type="text" id="futureSearch" placeholder="Notlarda ara..." />
+            <div class="row mt12" style="justify-content:flex-start;">
+              <button class="primary" id="newFutureBtn" type="button">Yeni Not</button>
+              <button class="ghost" id="toggleFuturePreviewBtn" type="button">Önizleme</button>
+            </div>
+            <div id="futureList" class="list mt12"></div>
+          </div>
+
+          <div class="card">
+            <h3>Düzenleyici</h3>
+            <input type="text" id="futureTitle" placeholder="Başlık (opsiyonel)" />
+            <textarea id="futureText" placeholder="Geleceğe not..."></textarea>
+
+            <div id="futurePreview" class="preview mt12" hidden></div>
+
+            <div class="row mt12">
+              <button class="primary" id="saveFutureBtn" type="button">Kaydet</button>
+              <button class="danger" id="deleteFutureBtn" type="button">Sil</button>
+              <span id="futureSaved" class="muted"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALENDAR -->
+      <section id="calendar" class="page">
+        <h2>Takvim</h2>
+        <p class="muted">Anı defteri, gelecek notları, özel günler ve sohbet hareketlerini tek ekranda gör.</p>
+
+        <div class="card mt16">
+          <div class="row" style="justify-content:flex-start;">
+            <button class="ghost" id="calPrevBtn" type="button">◀</button>
+            <div id="calTitle" style="font-weight:900;"></div>
+            <button class="ghost" id="calNextBtn" type="button">▶</button>
+            <button class="ghost" id="calTodayBtn" type="button">Bugün</button>
+          </div>
+          <div id="calendarGrid" class="calendar mt12" aria-label="Takvim"></div>
+          <div id="calendarDayDetail" class="card mt16" style="background: rgba(255,255,255,0.10);" hidden></div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="settings" class="page">
+        <h2>Ayarlar</h2>
+
+        <div class="grid2 mt16">
+          <div class="card">
+            <h3>Güvenlik</h3>
+            <p class="tiny muted">
+              Şifre: <b>08.06.25</b> (Bu sürümde düz şifre kontrolü de var; giriş sorunu yaşamazsın.)
+            </p>
+            <button class="ghost" id="copyHashHelpBtn" type="button">Hash nasıl üretilir?</button>
+            <div id="hashHelp" class="tiny muted mt12" hidden></div>
+            <hr class="sep-line mt16"/>
+
+            <h4 style="margin:10px 0 8px;">Şifre Değiştir</h4>
+            <div class="field" style="margin:0;">
+              <label class="label" for="oldPass">Mevcut şifre</label>
+              <input type="password" id="oldPass" placeholder="Mevcut şifre" autocomplete="current-password"/>
+            </div>
+            <div class="grid2 mt12">
+              <div class="field" style="margin:0;">
+                <label class="label" for="newPass">Yeni şifre</label>
+                <input type="password" id="newPass" placeholder="Yeni şifre" autocomplete="new-password"/>
+              </div>
+              <div class="field" style="margin:0;">
+                <label class="label" for="newPass2">Yeni şifre (tekrar)</label>
+                <input type="password" id="newPass2" placeholder="Tekrar" autocomplete="new-password"/>
+              </div>
+            </div>
+            <div class="row mt12" style="justify-content:flex-start; gap:10px;">
+              <button class="primary" id="changePassBtn" type="button">Değiştir</button>
+              <button class="ghost" id="resetPassBtn" type="button" title="Varsayılana dön">Sıfırla</button>
+            </div>
+            <div id="passState" class="tiny muted mt10"></div>
+
+          </div>
+
+          <div class="card">
+            <h3>Veri Yönetimi</h3>
+            <p class="tiny muted">Yedek al / geri yükle. (Tavsiye: yedekleri sakla.)</p>
+            <div class="row" style="justify-content:flex-start;">
+              <button class="ghost" id="exportBtn" type="button">Dışa aktar (JSON)</button>
+              <input type="file" id="importFile" accept="application/json" class="sr-only" />
+              <button class="ghost" id="importBtn" type="button">İçe aktar</button>
+            </div>
+
+            <div class="row mt12" style="justify-content:flex-start;">
+              <label class="checkbox" style="margin:0;">
+                <input type="checkbox" id="autoLockToggle" checked />
+                <span>Otomatik kilit</span>
+              </label>
+              <input id="autoLockMinutes" type="number" min="1" max="60" value="5" style="max-width:120px;" />
+              <span class="tiny muted">dk</span>
+            </div>
+            <p class="tiny muted mt12">Otomatik kilit açıkken, belirlediğin süre boyunca işlem yapmazsan giriş ekranına döner.</p>
+
+            <div class="row mt12">
+              <button class="danger" id="wipeAllBtn" type="button">Tüm verileri sil</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <p>Mevra ❤️ Mizra — Sonsuza Kadar</p>
+    </footer>
+  </div>
+
+  <!-- SLIDESHOW MODAL -->
+  <div id="slideshowModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-card">
+      <div class="row" style="justify-content:space-between;">
+        <b id="slideshowTitle">Slayt Gösterisi</b>
+        <button class="ghost" id="slideshowClose" type="button">Kapat</button>
+      </div>
+      <div class="slideshow mt12">
+        <img id="slideshowImg" alt="Slayt" />
+        <div class="row mt12" style="justify-content:space-between;">
+          <button class="ghost" id="slideshowPrev" type="button">◀</button>
+          <div id="slideshowMeta" class="tiny muted"></div>
+          <button class="ghost" id="slideshowNext" type="button">▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script_plus.js"></script>
+<!-- SUITE MODAL (features) -->
+<div id="suiteModal" class="modal" hidden>
+  <div class="modal-inner">
+    <h3 id="suiteModalTitle"></h3>
+    <div id="suiteModalBody"></div>
+    <div class="row mt12" style="justify-content:flex-end; gap:10px;">
+      <button class="ghost" id="suiteModalCloseBtn" type="button">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* SUITE_INJECT */
+document.addEventListener("DOMContentLoaded", () => {
+  const qs = (s)=>document.querySelector(s);
+
+  // HOME: Mood + Weekly Challenge + Quick Privacy
+  const home = qs("#home");
+  if (home && !qs("#suiteHome")) {
+    const wrap = document.createElement("div");
+    wrap.id = "suiteHome";
+    wrap.className = "grid2 mt16";
+    wrap.innerHTML = `
+      <div class="card">
+        <h3>🧠 Bugünün Modu</h3>
+        <p class="tiny muted">Günlük ruh hali takibi + seri (streak).</p>
+        <div class="row mt10" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+          <select id="moodSelect" class="select" aria-label="Mod seç">
+            <option value="">Seç...</option>
+            <option value="😍">😍 Aşık</option>
+            <option value="😊">😊 Mutlu</option>
+            <option value="😌">😌 Huzurlu</option>
+            <option value="😴">😴 Yorgun</option>
+            <option value="😤">😤 Sinirli</option>
+            <option value="😢">😢 Üzgün</option>
+          </select>
+          <button class="primary" id="moodSaveBtn" type="button">Kaydet</button>
+        </div>
+        <div id="moodOut" class="tiny muted mt12">—</div>
+      </div>
+
+      <div class="card">
+        <h3>🔥 Haftalık Meydan Okuma</h3>
+        <p class="tiny muted">Her hafta yeni mini görev. Tamamlayınca XP.</p>
+        <div id="weeklyOut" class="muted mt10">—</div>
+        <div class="row mt12" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+          <button class="primary" id="weeklyDoneBtn" type="button">Tamamlandı</button>
+          <button class="ghost" id="weeklyNewBtn" type="button">Yenile</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🏆 Seviye & XP</h3>
+        <p class="tiny muted">Yaptıkça seviye atla. Oyunlar/Anılar/Günlük XP verir.</p>
+        <div id="xpOut" class="muted mt10">—</div>
+        <div class="row mt12" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+          <button class="ghost" id="achievementsBtn" type="button">Rozetler</button>
+          <button class="ghost" id="statsBtn" type="button">İstatistik</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🫥 Gizli Mod</h3>
+        <p class="tiny muted">Tek tuşla her şeyi bulanıklaştır. Panik: CTRL+SHIFT+L.</p>
+        <div class="row mt10" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+          <button class="primary" id="privacyToggleBtn" type="button">Aç/Kapat</button>
+          <button class="ghost" id="fakeToggleBtn" type="button">Fake Mod</button>
+        </div>
+        <div id="privacyOut" class="tiny muted mt12">—</div>
+      </div>
+    `;
+    home.appendChild(wrap);
+  }
+
+  // FUTURE: Time Capsule
+  const future = qs("#future");
+  if (future && !qs("#suiteCapsule")) {
+    const wrap = document.createElement("div");
+    wrap.id = "suiteCapsule";
+    wrap.className = "card mt16";
+    wrap.innerHTML = `
+      <h3>⏳ Zaman Kapsülü</h3>
+      <p class="tiny muted">Mesajı geleceğe kilitle. Tarih gelmeden açılmaz.</p>
+      <div class="grid2 mt12">
+        <div class="field" style="margin:0;">
+          <label class="label" for="capsuleOpenAt">Açılma Tarihi</label>
+          <input type="date" id="capsuleOpenAt" />
+        </div>
+        <div class="field" style="margin:0;">
+          <label class="label" for="capsuleTitle">Başlık</label>
+          <input type="text" id="capsuleTitle" maxlength="60" placeholder="Örn: 1 yıl sonra" />
+        </div>
+      </div>
+      <div class="field mt12">
+        <label class="label" for="capsuleText">Mesaj</label>
+        <textarea id="capsuleText" maxlength="2000" placeholder="Geleceğe mesaj..."></textarea>
+      </div>
+      <div class="row mt12" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+        <button class="primary" id="capsuleAddBtn" type="button">Kapsül Oluştur</button>
+        <button class="ghost" id="capsuleClearBtn" type="button">Temizle</button>
+      </div>
+      <div id="capsuleList" class="mt12"></div>
+    `;
+    future.appendChild(wrap);
+  }
+
+  // CHAT: Voice Notes
+  const chat = qs("#chat");
+  if (chat && !qs("#suiteVoice")) {
+    const wrap = document.createElement("div");
+    wrap.id = "suiteVoice";
+    wrap.className = "card mt16";
+    wrap.innerHTML = `
+      <h3>🎙️ Sesli Not</h3>
+      <p class="tiny muted">1 dakikaya kadar ses kaydı al, burada sakla.</p>
+      <div class="row mt12" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+        <button class="primary" id="voiceRecBtn" type="button">Kaydı Başlat</button>
+        <button class="ghost" id="voiceStopBtn" type="button" disabled>Durdur</button>
+        <span id="voiceState" class="tiny muted"></span>
+      </div>
+      <div id="voiceList" class="mt12"></div>
+    `;
+    chat.appendChild(wrap);
+  }
+
+  // SETTINGS: Encrypted Export/Import + Reset
+  const settings = qs("#settings");
+  if (settings && !qs("#suiteSecurity")) {
+    const wrap = document.createElement("div");
+    wrap.id = "suiteSecurity";
+    wrap.className = "card mt16";
+    wrap.innerHTML = `
+      <h3>🔐 Güvenli Yedek</h3>
+      <p class="tiny muted">Dışa aktar / içe aktar. İstersen şifreli (AES-GCM).</p>
+      <div class="row mt12" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+        <button class="primary" id="exportEncBtn" type="button">Şifreli Dışa Aktar</button>
+        <button class="ghost" id="exportPlainBtn" type="button">JSON Dışa Aktar</button>
+        <label class="ghost" style="padding:12px 14px; border-radius:999px; cursor:pointer;">
+          İçe Aktar <input id="importFile" type="file" accept=".json,.mmenc,application/json" hidden />
+        </label>
+      </div>
+      <div class="row mt12" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+        <button class="danger" id="wipeAllBtn" type="button">Her Şeyi Sıfırla</button>
+      </div>
+      <div id="securityOut" class="tiny muted mt12">—</div>
+    `;
+    settings.appendChild(wrap);
+  }
+});
+</script>
+
+</body>
+</html>
